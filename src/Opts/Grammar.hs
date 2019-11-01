@@ -9,6 +9,10 @@ import Control.Monad (when)
 type FlagOnly = [String]
 isFlagOnly :: String -> FlagOnly -> Bool
 isFlagOnly = elem
+-- | Args that can *ONLY* be given with corresponding values.
+type ValueOnly = [String]
+isValueOnly :: String -> ValueOnly -> Bool
+isValueOnly = elem
 
 data Argument = Short Char | Long String deriving (Show)
 argName :: Argument -> String
@@ -18,8 +22,8 @@ argName (Long str) = str
 data Option = Flag Argument | Value Argument String | Positional String deriving (Show)
 
 -- | Parse all cli opts.
-parseOptions :: FlagOnly -> Parser [Option]
-parseOptions flagonly = many $ (parseValue flagonly <|> parseFlag <|> parsePositional) >>= \opt -> (zeroOrOne spacing) >> return opt
+parseOptions :: FlagOnly -> ValueOnly -> Parser [Option]
+parseOptions fonly vonly = many $ (parseValue fonly <|> parseFlag vonly <|> parsePositional) >>= \opt -> (zeroOrOne spacing) >> return opt
 
 -- | Parse a single argument structure, either -o or --option
 parseArgument :: Parser Argument
@@ -47,8 +51,11 @@ parseValue fo = do
     return $ Value arg val
             
 -- | Parses a flag, with no argument 
-parseFlag :: Parser Option
-parseFlag = Flag <$> parseArgument
+parseFlag :: ValueOnly -> Parser Option
+parseFlag vo = Flag <$> do
+    arg <- parseArgument
+    when (isValueOnly (argName arg) vo) $ failure "This option is specified as value-only." 
+    return arg
 
 -- | Parses positional arguments
 parsePositional :: Parser Option
