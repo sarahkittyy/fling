@@ -52,7 +52,7 @@ evalExpr env (Wrapped expr) = evalExpr env expr
 evalExpr env (Variable v) =
     case lookup v (bindings env) of
         Nothing -> Left $ "Variable " ++ v ++ " not defined."
-        Just val -> Right (val, env)
+        Just val -> Right val
 
 evalExpr env (Call name params) =
     case lookup name (functions env) of
