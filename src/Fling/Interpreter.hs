@@ -55,23 +55,32 @@ evalExpr env (Variable v) =
         Just val -> Right val
 
 evalExpr env (Call name params) =
+    -- Lookup the function name
     case lookup name (functions env) of
         Nothing -> Left $ "Function " ++ name ++ " not defined."
+        -- if found,,,
         Just fn ->
+            -- Create a new env populated with argument bindings, and evaluate the body of the function with it.
             case flip evalExpr (body fn) <$> bindValues (args fn) params env of
-                Nothing -> Left "Could not evalute inner params"
+                Nothing -> Left "Could not evalute inner params of function call."
                 Just res -> res
     where
+        -- | Binds a list of argument names to their corresponding expression, and populates an environment with them
         bindValues :: [String] -> [Expression] -> Env -> Maybe Env
         bindValues names vals env =
+            -- zip up the names and their values..
+            --TODO: Count arguments
             let zipped = zip names (map (evalExpr' env) vals)
             in if any (not . isJust . snd) zipped
-                    then Nothing
+                    then Nothing -- the whole thing fails if any argument fails
+                        -- otherwise, insert each binding into the environment
                     else Just $ foldr (flip insertBinding') env $ map (\(s, le) -> (s, fromJust le)) zipped
             where
+                -- | Curried version of insertBinding
                 insertBinding' :: Env -> (String, Literal) -> Env
                 insertBinding' env = uncurry (insertBinding env)
 
+                -- | Returns Nothing instead of an error message for evalExpr
                 evalExpr' :: Env -> Expression -> Maybe Literal
                 evalExpr' env expr =
                     case evalExpr env expr of
