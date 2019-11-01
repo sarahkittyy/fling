@@ -141,10 +141,10 @@ number :: Parser String
 number = do
     sign <- zeroOrOne (char '-')
     whole <- natural <|> pure "0"
-    decimal <- do
+    decimal <- ( do
         pt <- char '.'
         fpart <- natural
-        return $ pt:fpart
+        return $ pt:fpart ) <|> pure ""
     return $ sign ++ whole ++ decimal
 
 -- | Matches a specific count of characters
