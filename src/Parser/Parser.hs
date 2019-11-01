@@ -159,10 +159,14 @@ zeroOrOne p = nOf 1 p <|> pure []
 spacing :: Parser String
 spacing = some $ satisfies (isSpace)
     
+-- | Matches a parser between two parsers
+between :: Parser l -> Parser r -> Parser v -> Parser v
+between l r v = do
+    l <|> (failure $ "Could not match between's start value.")
+    res <- v
+    r <|> (failure $ "Could not match between's end value.")
+    return res
+
 -- | Matches anything surrounded in parentheses
 parens :: Parser a -> Parser a
-parens p = do
-    char '(' 
-    match <- p
-    char ')' <|> (failure $ "Could not find closing parenthesis.")
-    return match
+parens = between (char '(') (char ')')
