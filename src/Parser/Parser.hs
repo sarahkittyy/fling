@@ -100,8 +100,12 @@ nOf n p = do
     return (c:rest)
     
 -- | Tries to parse 0 or one of the given parser
-maybeP :: Parser a -> Parser (Maybe a)
-maybeP p = Just <$> p <|> pure Nothing
+zeroOrOne :: Parser a -> Parser [a] 
+zeroOrOne p = nOf 1 p <|> pure []
+
+-- | Parses some spacing
+spacing :: Parser String
+spacing = some $ satisfies (isSpace)
     
 -- | Matches anything surrounded in parentheses
 parens :: Parser a -> Parser a
