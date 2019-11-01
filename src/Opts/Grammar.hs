@@ -2,7 +2,6 @@
 module Opts.Grammar where
     
 import Parser.Parser
-import Control.Applicative hiding (some, many)
 import Data.Char
 import Control.Monad (when)
 
