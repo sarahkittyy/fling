@@ -23,7 +23,16 @@ argName (Long str) = str
 data Program = Program { flagOnly :: FlagOnly
                        , valueOnly :: ValueOnly }
 
+-- | A single cli option.
 data Option = Flag Argument | Value Argument String | Positional String deriving (Show)
+getArg :: Option -> Maybe String
+getArg (Flag arg) = Just $ argName arg
+getArg (Value arg _) = Just $ argName arg
+getArg (Positional _) = Nothing
+
+getValue :: Option -> Maybe String
+getValue (Value _ val) = Just val
+getValue _ = Nothing
 
 -- | Parse all cli opts.
 parseOptions :: Program -> Parser [Option]
