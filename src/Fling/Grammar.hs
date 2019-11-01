@@ -5,7 +5,7 @@ module Fling.Grammar where
     
 import Parser.Parser
 
--- | Expressions
+-- | Expressions are anything that reduces to a literal
 data Expression = Literal Literal | Wrapped Expression deriving (Show)
 parseExpression :: Parser Expression
 parseExpression = (Literal <$> parseLiteral)
@@ -14,7 +14,7 @@ parseExpression = (Literal <$> parseLiteral)
         parseWrapped :: Parser Expression
         parseWrapped = Wrapped <$> parens parseExpression
 
--- | Literals
+-- | Literals are the most basic form of expression
 data Literal = Number String | String String deriving (Show)
 parseLiteral :: Parser Literal
 parseLiteral = parseNumber
