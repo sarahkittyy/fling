@@ -27,7 +27,7 @@ data Option = Flag Argument | Value Argument String | Positional String deriving
 
 -- | Parse all cli opts.
 parseOptions :: Program -> Parser [Option]
-parseOptions (Program fonly vonly) = many $ (parseValue fonly <|> parseFlag vonly <|> parsePositional) >>= \opt -> (zeroOrOne spacing) >> return opt
+parseOptions (Program fonly vonly) = sepBy spacing $ (parseValue fonly <|> parseFlag vonly <|> parsePositional)
 
 -- | Parse a single argument structure, either -o or --option
 parseArgument :: Parser Argument
