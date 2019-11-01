@@ -25,9 +25,9 @@ data Program = Program { flagOnly :: FlagOnly
 
 -- | A single cli option.
 data Option = Flag Argument | Value Argument String | Positional String deriving (Show)
-getArg :: Option -> Maybe String
-getArg (Flag arg) = Just $ argName arg
-getArg (Value arg _) = Just $ argName arg
+getArg :: Option -> Maybe Argument
+getArg (Flag arg) = Just arg
+getArg (Value arg _) = Just arg
 getArg (Positional _) = Nothing
 
 getValue :: Option -> Maybe String
