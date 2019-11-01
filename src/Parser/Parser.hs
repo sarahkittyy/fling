@@ -21,6 +21,10 @@ module Parser.Parser
 , nOf
 , zeroOrOne
 , spacing
+, between
+, quoted
+, upTo
+, upToI
 , parens
 )where
     
@@ -158,6 +162,20 @@ zeroOrOne p = nOf 1 p <|> pure []
 -- | Parses some spacing
 spacing :: Parser String
 spacing = some $ satisfies (isSpace)
+
+-- | Matches items until a given parser matches
+upTo :: Parser a -> Parser String
+upTo p = (p >> pure "") <|> do
+                c <- item
+                cs <- upTo p
+                return $ c:cs
+               
+-- | Matches up until the given parser matches, including it in the result
+upToI :: Parser String -> Parser String
+upToI p = p <|> do
+    c <- item
+    cs <- upToI p 
+    return $ c:cs
     
 -- | Matches a parser between two parsers
 between :: Parser l -> Parser r -> Parser v -> Parser v
@@ -170,3 +188,9 @@ between l r v = do
 -- | Matches anything surrounded in parentheses
 parens :: Parser a -> Parser a
 parens = between (char '(') (char ')')
+
+-- | Matches quoted text
+quoted :: Parser String
+quoted = do
+    char '"'
+    upToI $ (satisfies (/='\\')) >>= \cf -> char '"' >> return (cf:"")
