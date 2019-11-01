@@ -12,6 +12,6 @@ fromOpts prog opts =
     in case parse (parseOptions prog) input of
         Left err -> Left err
         Right (res, rest) ->
-            if null rest
+            if not $ null rest
                 then Left "Error in arguments given."
                 else Right res
