@@ -20,3 +20,5 @@ executable fling
   build-depends:       base >= 4.7 && < 5
   other-modules:       Parser.Parser
                      , Opts.Grammar
+                     , Fling.Grammar
+                     , Fling.Interpreter
