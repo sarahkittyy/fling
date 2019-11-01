@@ -99,6 +99,10 @@ nOf n p = do
     rest <- nOf (n - 1) p <|> (failure $ "Need " ++ (show n) ++ " more matches of parser, yet stream could not satisfy.")
     return (c:rest)
     
+-- | Tries to parse 0 or one of the given parser
+maybeP :: Parser a -> Parser (Maybe a)
+maybeP p = Just <$> p <|> pure Nothing
+    
 -- | Matches anything surrounded in parentheses
 parens :: Parser a -> Parser a
 parens p = do
