@@ -2,6 +2,7 @@
 
 module Parser.Parser
 ( Parser
+, parse
 , runParser
 , failure
 , empty
