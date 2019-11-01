@@ -19,11 +19,7 @@ fromOpts prog opts =
                 
 -- | Checks if the option exists.
 hasAnyOpt :: [String] -> [Option] -> Bool
-hasAnyOpt check opts = any id $
-    flip map opts $ \opt ->
-        case getArg opt of
-            Nothing -> False
-            Just arg -> (argName arg) `elem` check
+hasAnyOpt = (isJust .) . getOpt
 
 -- | Get an opt that matches the given opt aliases
 getOpt :: [String] -> [Option] -> Maybe Option
