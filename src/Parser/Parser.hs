@@ -30,6 +30,7 @@ module Parser.Parser
     
 import Control.Applicative hiding (some, many)
 import Data.Char
+import Control.Monad (when)
     
 -- | Parser data type.
 data Parser a = Parser { parse :: String -> Either String (a, String) }
@@ -140,11 +141,12 @@ integer = do
 number :: Parser String
 number = do
     sign <- zeroOrOne (char '-')
-    whole <- natural <|> pure "0"
+    whole <- natural <|> pure ""
     decimal <- ( do
         pt <- char '.'
         fpart <- natural
         return $ pt:fpart ) <|> pure ""
+    when (null whole && null decimal) $ failure "No numbers at all given..? >w<"
     return $ sign ++ whole ++ decimal
 
 -- | Matches a specific count of characters
