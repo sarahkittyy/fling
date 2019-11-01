@@ -19,11 +19,15 @@ argName :: Argument -> String
 argName (Short ch) = [ch]
 argName (Long str) = str
 
+-- | The main program data! Includes positional arg count, and flags that are only value / only flag.
+data Program = Program { flagOnly :: FlagOnly
+                       , valueOnly :: ValueOnly }
+
 data Option = Flag Argument | Value Argument String | Positional String deriving (Show)
 
 -- | Parse all cli opts.
-parseOptions :: FlagOnly -> ValueOnly -> Parser [Option]
-parseOptions fonly vonly = many $ (parseValue fonly <|> parseFlag vonly <|> parsePositional) >>= \opt -> (zeroOrOne spacing) >> return opt
+parseOptions :: Program -> Parser [Option]
+parseOptions (Program fonly vonly) = many $ (parseValue fonly <|> parseFlag vonly <|> parsePositional) >>= \opt -> (zeroOrOne spacing) >> return opt
 
 -- | Parse a single argument structure, either -o or --option
 parseArgument :: Parser Argument

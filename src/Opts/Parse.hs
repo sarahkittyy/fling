@@ -6,10 +6,10 @@ import Parser.Parser
 import Data.List
 
 -- | Converts all the input args to parseable options
-fromOpts :: FlagOnly -> ValueOnly -> [String] -> Either String [Option]
-fromOpts fo vo opts =
+fromOpts :: Program -> [String] -> Either String [Option]
+fromOpts prog opts =
     let input = intercalate " " opts
-    in case parse (parseOptions fo vo) input of
+    in case parse (parseOptions prog) input of
         Left err -> Left err
         Right (res, rest) ->
             if null rest
