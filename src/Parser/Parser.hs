@@ -12,6 +12,8 @@ module Parser.Parser
 , char
 , some
 , many
+, sepBy
+, sepBy1
 , anyOf
 , noneOf
 , string
@@ -109,6 +111,17 @@ some p = (:) <$> p <*> (some p <|> pure [])
 -- | 0 or more of a given parser
 many :: Parser a -> Parser [a]
 many p = some p <|> pure [] 
+
+-- | Separate parsers by another parser -- 0 or more
+sepBy :: Parser b -> Parser a -> Parser [a]
+sepBy sep p = sepBy1 sep p <|> pure []
+
+-- | Separate parsers by another parser -- 1 or more
+sepBy1 :: Parser b -> Parser a -> Parser [a]
+sepBy1 sep p = do
+    x <- p
+    xs <- many (sep >> p) 
+    return $ x:xs
 
 -- | Matches any of the given characters.
 anyOf :: [Char] -> Parser Char
