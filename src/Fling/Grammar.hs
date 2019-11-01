@@ -23,27 +23,40 @@ parseStatement = parseFunction
             string "def"
             spacing
             name <- validVarName
-            args <- parens $ sepBy spacing (validVarName)
+            zeroOrOne spacing
+            args <- parens $ (zeroOrOne spacing) >> (sepBy spacing (validVarName) <* (zeroOrOne spacing))
+            zeroOrOne spacing
             char '{'
+            zeroOrOne spacing
             body <- parseExpression
+            zeroOrOne spacing
             char '}'
             
             return $ Function name args body
     
 -- | Expressions are anything that reduces to a literal
 data Expression = Literal Literal
+                    | Call String [Expression]
                     | Variable String
                     | Wrapped Expression
                     deriving (Show)
 
 parseExpression :: Parser Expression
 parseExpression = (Literal <$> parseLiteral)
+                    <|> parseCall
                     <|> parseVariable
                     <|> parseWrapped
                     <|> (failure "Invalid expression!")
     where
         parseWrapped :: Parser Expression
         parseWrapped = Wrapped <$> parens parseExpression
+        
+        parseCall :: Parser Expression
+        parseCall = do
+            name <- validVarName
+            zeroOrOne spacing
+            args <- parens $ (zeroOrOne spacing) >> (sepBy spacing parseExpression <* (zeroOrOne spacing))
+            return $ Call name args
 
         parseVariable :: Parser Expression
         parseVariable = Variable <$> validVarName
