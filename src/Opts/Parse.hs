@@ -4,6 +4,7 @@ module Opts.Parse where
 import Opts.Grammar
 import Parser.Parser
 import Data.List
+import Data.Maybe (isJust)
 
 -- | Converts all the input args to parseable options
 fromOpts :: Program -> [String] -> Either String [Option]
@@ -15,3 +16,15 @@ fromOpts prog opts =
             if not $ null rest
                 then Left "Error in arguments given."
                 else Right res
+                
+-- | Checks if the option exists.
+hasAnyOpt :: [String] -> [Option] -> Bool
+hasAnyOpt check opts = any id $
+    flip map opts $ \opt ->
+        case getArg opt of
+            Nothing -> False
+            Just arg -> (argName arg) `elem` check
+
+-- | Get an opt that matches the given opt aliases
+getOpt :: [String] -> [Option] -> Maybe Option
+getOpt names opts = find (\opt -> isJust $ ((`elem` names) . argName) <$> getArg opt) opts
