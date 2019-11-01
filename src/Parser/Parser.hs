@@ -1,6 +1,28 @@
 {-# LANGUAGE InstanceSigs #-}
 
-module Parser.Parser where
+module Parser.Parser
+( Parser
+, runParser
+, failure
+, empty
+, (<|>)
+, item
+, satisfies
+, char
+, some
+, many
+, anyOf
+, noneOf
+, string
+, digit
+, natural
+, integer
+, number
+, nOf
+, zeroOrOne
+, spacing
+, parens
+)where
     
 import Control.Applicative hiding (some, many)
 import Data.Char
@@ -86,10 +108,40 @@ many p = some p <|> pure []
 anyOf :: [Char] -> Parser Char
 anyOf chars = satisfies (`elem` chars)
 
+-- | Matches none of the given characters
+noneOf :: [Char] -> Parser Char
+noneOf chars = satisfies $ not . flip elem chars
+
 -- | Matches a specific string of characters
 string :: String -> Parser String
 string "" = pure ""
 string (c:cs) = char c >>= \rc -> string cs >>= \rcs -> return (rc:rcs) 
+
+-- | Matches a single digit
+digit :: Parser Char
+digit = satisfies isDigit
+
+-- | Matches a whole positive integer
+natural :: Parser String
+natural = some digit
+
+-- | Matches a positive or negative integer.
+integer :: Parser String
+integer = do
+    sign <- zeroOrOne (char '-')
+    num <- natural
+    return $ sign ++ num
+    
+-- | Matches a positive or negative decimal number.
+number :: Parser String
+number = do
+    sign <- zeroOrOne (char '-')
+    whole <- natural <|> pure "0"
+    decimal <- do
+        pt <- char '.'
+        fpart <- natural
+        return $ pt:fpart
+    return $ sign ++ whole ++ decimal
 
 -- | Matches a specific count of characters
 nOf :: Int -> Parser a -> Parser [a]
