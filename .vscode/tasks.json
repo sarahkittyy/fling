@@ -4,7 +4,7 @@
 		{
 			"type": "shell",
 			"label": "run",
-			"command": "stack run",
+			"command": "stack run -- -i",
 			"args": [
 				
 			],

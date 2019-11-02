@@ -12,12 +12,23 @@ class ReplShow a where
 
 -- | Statements are anything that doesn't reduce.
 data Statement = Function String [String] Expression
+                    | Binding String Expression
                     deriving (Show)
                     
 parseStatement :: Parser Statement
 parseStatement = parseFunction
+                    <|> parseBinding
                     <|> (failure "Invalid statement!")
     where
+        parseBinding :: Parser Statement
+        parseBinding = do
+            string "def"
+            spacing
+            name <- validVarName
+            spacing
+            expr <- parseExpression
+            return $ Binding name expr
+        
         parseFunction :: Parser Statement
         parseFunction = do
             string "def"

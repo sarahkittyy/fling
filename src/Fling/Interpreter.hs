@@ -91,3 +91,9 @@ evalExpr env (Call name params) =
 -- | Evaluates a statement
 evalStatement :: Env -> Statement -> Either String Env
 evalStatement env (G.Function name args body) = Right $ insertFunction env name (Function args body)
+evalStatement env (Binding name expr) = do
+    res <- evalExpr env expr
+    Right $ insertBinding env name res
+
+
+
